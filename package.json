@@ -18,6 +18,8 @@
     "parameter": "^3.6.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
     "egg-bin": "^4.14.0",
     "eslint": "^6.7.2",
     "eslint-config-egg": "^8.0.0",
@@ -29,6 +31,7 @@
   },
   "husky": {
     "hooks": {
+      "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS",
       "pre-commit": "lint-staged"
     }
   },
