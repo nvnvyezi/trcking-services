@@ -2,12 +2,9 @@ const Controller = require('egg').Controller
 
 class Login extends Controller {
   async index() {
-    console.log(
-      'login',
-      this.ctx.request.body,
-      this.ctx.request.queries,
-      this.ctx.ip,
-    )
+    const { ctx, service } = this
+    const { username, password, team } = ctx.request.body
+
     const createRule = {
       username: { type: 'string', format: '', max: 16, min: 6 },
       password: { type: 'password', compare: '', max: 16, min: 6 },
@@ -15,21 +12,23 @@ class Login extends Controller {
       email: { type: 'email', allowEmpty: true, required: false },
     }
 
-    const errors = await this.ctx.app.validate(
-      createRule,
-      this.ctx.request.body,
-    )
+    const errors = await ctx.app.validate(createRule, ctx.request.body)
+
     if (errors) {
-      console.log('validate errors', errors)
-      this.ctx.status = 422
-      this.ctx.body = {
-        success: false,
-        msg: errors,
-      }
+      ctx.status = 422
+      ctx.body = ctx.responseBody(false, { errors })
       return
     }
 
-    this.ctx.body = { text: 'hello world!' }
+    const users = await service.user.find(username, password, team)
+
+    if (!users || !users.length) {
+      ctx.status = 403
+      ctx.body = ctx.responseBody(false, { msg: '没有权限访问' })
+      return
+    }
+
+    ctx.body = ctx.responseBody(true, { username, team })
   }
 }
 

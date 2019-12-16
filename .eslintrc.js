@@ -14,5 +14,6 @@ module.exports = {
     'prettier/prettier': 'error',
     semi: ['error', 'never'],
     'comma-dangle': ['error', 'always-multiline'],
+    'no-return-await': 'error',
   },
 }
