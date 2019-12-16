@@ -1,18 +1,19 @@
-const Controller = require('egg').Controller
+const { Controller } = require('egg')
+
+const userRule = {
+  username: { type: 'string', format: '', max: 16, min: 6 },
+  password: { type: 'password', compare: '', max: 16, min: 6 },
+  team: { type: 'string', trim: true, min: 3, max: 4 },
+  email: { type: 'email', allowEmpty: true, required: false },
+}
 
 class Login extends Controller {
   async index() {
-    const { ctx, service } = this
+    const { ctx, service, app } = this
     const { username, password, team } = ctx.request.body
+    const { secret } = app.config.jwt
 
-    const createRule = {
-      username: { type: 'string', format: '', max: 16, min: 6 },
-      password: { type: 'password', compare: '', max: 16, min: 6 },
-      team: { type: 'string', trim: true, min: 3, max: 4 },
-      email: { type: 'email', allowEmpty: true, required: false },
-    }
-
-    const errors = await ctx.app.validate(createRule, ctx.request.body)
+    const errors = await ctx.app.validate(userRule, ctx.request.body)
 
     if (errors) {
       ctx.status = 422
@@ -27,6 +28,19 @@ class Login extends Controller {
       ctx.body = ctx.responseBody(false, { msg: '没有权限访问' })
       return
     }
+
+    const token = app.jwt.sign(
+      {
+        iss: 'liliye',
+        sub: 'buried-point-management',
+        username,
+      },
+      secret,
+    )
+
+    ctx.set({
+      Authorization: `bearer ${token}`,
+    })
 
     ctx.body = ctx.responseBody(true, { username, team })
   }

@@ -1,4 +1,4 @@
-const Service = require('egg').Service
+const { Service } = require('egg')
 
 /**
  * 数据库返回用户类型

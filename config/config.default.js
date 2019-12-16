@@ -1,4 +1,4 @@
-const jwt = require('../constant/mongoose.json')
+const jwt = require('../constant/jwt.json')
 
 exports.keys = 'nvnyezi'
 
@@ -14,6 +14,7 @@ exports.validate = {
 exports.middleware = ['token']
 
 exports.jwt = {
-  enable: true,
   secret: jwt.secret,
+  expiresIn: '1h',
+  ignore: [/^\/$/],
 }

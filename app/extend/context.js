@@ -6,7 +6,7 @@ module.exports = {
    * @param {*} obj 响应body 自定义部分
    * @return {{success: boolean}} 响应body
    */
-  responseBody(bool = true, obj) {
+  responseBody(bool = true, obj = {}) {
     return { success: bool, ...obj }
   },
 }

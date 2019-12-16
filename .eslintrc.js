@@ -15,5 +15,7 @@ module.exports = {
     semi: ['error', 'never'],
     'comma-dangle': ['error', 'always-multiline'],
     'no-return-await': 'error',
+    'no-unused-vars': 'warn',
+    'prefer-destructuring': 'error',
   },
 }

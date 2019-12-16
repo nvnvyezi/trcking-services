@@ -1,5 +1,11 @@
 {
+  "eslint.autoFixOnSave": true,
+  "eslint.validate": [
+    "javascript" //  用eslint的规则检测js文件
+  ],
   "javascript.validate.enable": false,
   "editor.formatOnSave": true,
-  "editor.fontWeight": "normal"
+  "editor.fontWeight": "normal",
+  "editor.tabSize": 2,
+  "editor.fontFamily": "'Fira Code', 'YaHei Consolas Hybrid', Menlo, Monaco, 'Courier New', monospace"
 }
