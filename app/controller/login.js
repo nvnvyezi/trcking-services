@@ -25,7 +25,7 @@ class Login extends Controller {
 
     if (!users || !users.length) {
       ctx.status = 403
-      ctx.body = ctx.responseBody(false, { msg: '没有权限访问' })
+      ctx.body = ctx.responseBody(false, { msg: 'Account does not exist' })
       return
     }
 

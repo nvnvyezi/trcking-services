@@ -11,10 +11,11 @@ exports.validate = {
   convert: true,
 }
 
-exports.middleware = ['token']
-
 exports.jwt = {
+  enable: true,
+  // ignore: /^\/login$/,
   secret: jwt.secret,
   expiresIn: '1h',
-  ignore: [/^\/$/],
 }
+
+exports.middleware = ['jwt']
