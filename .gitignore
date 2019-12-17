@@ -4,4 +4,6 @@ logs/
 run
 .DS_Store
 
-constant/*
+constant/jwt.json
+constant/mongoose.json
+constant/redis.json

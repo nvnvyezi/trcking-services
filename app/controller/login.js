@@ -1,7 +1,7 @@
 const { Controller } = require('egg')
 
 const userRule = {
-  username: { type: 'string', format: '', max: 16, min: 6 },
+  username: { type: 'string', format: '', max: 16, min: 1 },
   password: { type: 'password', compare: '', max: 16, min: 6 },
   team: { type: 'string', trim: true, min: 3, max: 4 },
   email: { type: 'email', allowEmpty: true, required: false },
@@ -12,6 +12,7 @@ class Login extends Controller {
     const { ctx, service, app } = this
     const { username, password, team } = ctx.request.body
     const { secret } = app.config.jwt
+    const { expires } = app.config.redis
 
     const errors = await ctx.app.validate(userRule, ctx.request.body)
 
@@ -37,6 +38,13 @@ class Login extends Controller {
       },
       secret,
     )
+
+    await app.redis.setnx(username, username)
+    const expiresStatus = await app.redis.pexpireat(username, expires)
+
+    if (expiresStatus === 0) {
+      await app.redis.del(username)
+    }
 
     ctx.set({
       Authorization: `bearer ${token}`,

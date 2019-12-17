@@ -1,6 +1,7 @@
 const jwt = require('../constant/jwt.json')
+const redis = require('../constant/redis.json')
 
-exports.keys = 'nvnyezi'
+exports.middleware = ['jwt']
 
 exports.security = {
   csrf: false,
@@ -13,9 +14,17 @@ exports.validate = {
 
 exports.jwt = {
   enable: true,
-  // ignore: /^\/login$/,
+  ignore: /^\/login$/,
   secret: jwt.secret,
   expiresIn: '1h',
 }
 
-exports.middleware = ['jwt']
+exports.redis = {
+  client: {
+    port: redis.port,
+    host: redis.host,
+    password: redis.password,
+    db: redis.db,
+  },
+  expires: 7 * 12 * 60 * 60 * 1000 + Date.now(),
+}
