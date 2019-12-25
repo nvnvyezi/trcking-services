@@ -9,10 +9,10 @@ module.exports = app => {
     password: {
       type: String,
     },
-    team: {
-      type: String,
+    admin: {
+      type: Boolean,
     },
-    enail: {
+    email: {
       type: String,
     },
   })

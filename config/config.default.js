@@ -14,7 +14,7 @@ exports.validate = {
 
 exports.jwt = {
   enable: true,
-  ignore: /^\/login$/,
+  ignore: [/^\/api\/(login|registry)$/, /^\/$/],
   secret: jwt.secret,
   expiresIn: '1h',
 }
@@ -27,4 +27,9 @@ exports.redis = {
     db: redis.db,
   },
   expires: 7 * 12 * 60 * 60 * 1000 + Date.now(),
+}
+exports.cluster = {
+  listen: {
+    port: 8001,
+  },
 }

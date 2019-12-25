@@ -17,5 +17,6 @@ module.exports = {
     'no-return-await': 'error',
     'no-unused-vars': 'warn',
     'prefer-destructuring': 'error',
+    'no-console': 'warn',
   },
 }

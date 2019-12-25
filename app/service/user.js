@@ -14,26 +14,66 @@ class UserService extends Service {
    * @memberof UserService
    */
   async findAll() {
-    const users = await this.ctx.model.User.find()
-    return users
+    const result = await this.ctx.model.User.find()
+    return result
+  }
+
+  /**
+   *查询一个用户
+   *
+   * @param {{username?: string;email?: string}} querys  用户name
+   * @return {MongoUser} 某个具体的用户
+   * @memberof UserService
+   */
+  async find(querys = {}) {
+    const result = await this.ctx.model.User.findOne(querys)
+    return result
   }
 
   /**
    *查询一个用户
    *
    * @param {string} uid  用户name
-   * @param {string} password  用户密码
-   * @param {string} team  用户team
    * @return {MongoUser} 某个具体的用户
    * @memberof UserService
    */
-  async find(uid, password, team) {
-    const users = await this.ctx.model.User.find({
-      username: uid,
-      password,
-      team,
-    })
-    return users
+  async findFromName(uid) {
+    return this.find({ username: uid })
+  }
+
+  /**
+   *查询一个用户
+   *
+   * @param {string} email  用户email
+   * @return {MongoUser} 某个具体的用户
+   * @memberof UserService
+   */
+  async findFromEmail(email) {
+    return this.find({ email })
+  }
+
+  /**
+   *查询一个用户
+   *
+   * @param {string} username  用户id
+   * @param {string} password  用户password
+   * @return {MongoUser} 某个具体的用户
+   * @memberof UserService
+   */
+  async findFromLogin(username, password) {
+    return this.find({ username, password })
+  }
+
+  /**
+   *插入一个用户
+   *
+   * @param {{username: string;email: string;password: string;admin: boolean}} params  用户name
+   * @return {MongoUser} 某个具体的用户
+   * @memberof UserService
+   */
+  async insert(params) {
+    const result = await this.ctx.model.User.create(params)
+    return result
   }
 }
 
