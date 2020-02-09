@@ -19,6 +19,7 @@
     "egg-redis": "^2.4.0",
     "jsonwebtoken": "^8.5.1",
     "koa-jwt": "^3.6.0",
+    "node-rsa": "^1.0.7",
     "parameter": "^3.6.0"
   },
   "devDependencies": {

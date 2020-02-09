@@ -1,4 +1,7 @@
 const { Controller } = require('egg')
+const NodeRSA = require('node-rsa')
+
+const { privateKey } = require('../../constant/rsa')
 
 const userRule = {
   username: { type: 'string', format: '', max: 16, min: 1 },
@@ -12,8 +15,14 @@ class Login extends Controller {
     const { username, password, remember } = ctx.request.body
     const { secret } = app.config.jwt
     const { expires } = app.config.redis
+    const jsencrypt = new NodeRSA(privateKey)
+    jsencrypt.setOptions({ encryptionScheme: 'pkcs1' }) // 因为jsencrypt自身使用的是pkcs1加密方案, nodejs需要修改成pkcs1。
+    const dePassword = jsencrypt.decrypt(password, 'utf8')
 
-    const errors = await ctx.validate(userRule, ctx.request.body)
+    const errors = await ctx.validate(userRule, {
+      ...ctx.request.body,
+      password: dePassword,
+    })
 
     if (errors) {
       ctx.status = 422
@@ -21,7 +30,7 @@ class Login extends Controller {
       return
     }
 
-    const users = await service.user.findFromLogin(username, password)
+    const users = await service.user.findFromLogin(username, dePassword)
 
     if (!users || !users.username) {
       ctx.status = 403

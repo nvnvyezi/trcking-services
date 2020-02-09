@@ -1,5 +1,4 @@
 {
-  "eslint.autoFixOnSave": true,
   "eslint.validate": [
     "javascript" //  用eslint的规则检测js文件
   ],
