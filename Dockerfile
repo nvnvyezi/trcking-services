@@ -33,7 +33,7 @@ COPY package.json /usr/src/node-app/tracking/package.json
 
 # 安装npm依赖(使用淘宝的镜像源)
 # 如果使用的境外服务器，无需使用淘宝的镜像源，即改为`RUN npm i`。
-RUN npm i --registry=https://registry.npm.taobao.org
+RUN yarn install
 
 # 拷贝所有源代码到工作目录
 COPY . /usr/src/node-app/tracking
@@ -42,4 +42,4 @@ COPY . /usr/src/node-app/tracking
 EXPOSE 8001
 
 # 启动node应用
-CMD npm start
+CMD yarn run start
