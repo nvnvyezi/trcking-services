@@ -1,5 +1,5 @@
 # 设置基础镜像,如果本地没有该镜像，会从Docker.io服务器pull镜像
-FROM node
+FROM node:10.19.0-alpine
 
 # 设置时区
 ENV TIME_ZONE=Asia/Shanghai
@@ -12,14 +12,14 @@ ENV TIME_ZONE=Asia/Shanghai
 
 
 # 在容器内运行命令
-RUN \
-  mkdir -p /usr/src/node-app/tracking \
-  && apk add --no-cache tzdata \
-  && echo "${TIME_ZONE}" > /etc/timezone \ 
-  && ln -sf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime 
+#RUN \
+#  mkdir -p /usr/src/node-app/tracking \
+#  && apk add --no-cache tzdata \
+#  && echo "${TIME_ZONE}" > /etc/timezone \ 
+#  && ln -sf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime 
 
 # # 创建app目录
-# RUN mkdir -p /node-app/tracking
+RUN mkdir -p /usr/src/node-app/tracking
 
 # 设置工作目录
 WORKDIR /usr/src/node-app/tracking
