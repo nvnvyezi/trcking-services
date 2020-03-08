@@ -1,5 +1,6 @@
 const jwt = require('../constant/jwt.json')
 const redis = require('../constant/redis.json')
+const mongoose = require('../constant/mongoose.json')
 
 exports.middleware = ['jwt']
 
@@ -31,5 +32,14 @@ exports.redis = {
 exports.cluster = {
   listen: {
     port: 8001,
+  },
+}
+
+exports.mongoose = {
+  client: {
+    url: mongoose.url,
+    options: {
+      useUnifiedTopology: true,
+    },
   },
 }
