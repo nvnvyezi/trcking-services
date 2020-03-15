@@ -2,18 +2,22 @@
   "name": "egg-graduation-project",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "dev": "egg-bin dev",
-    "start": "egg-scripts start --port=7001",
+    "start": "egg-scripts start --port=7001 --title=egg-tracking",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
-    "node": ">=8.9.0",
+    "node": ">=10.0.0",
     "egg": ">=2.0.0"
   },
   "author": "liliye",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nvnvyezi/buried-point-services"
+  },
   "dependencies": {
     "egg": "^2.26.0",
     "egg-mongoose": "^3.2.0",

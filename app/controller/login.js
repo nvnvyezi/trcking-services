@@ -16,7 +16,8 @@ class Login extends Controller {
     const { secret } = app.config.jwt
     const { expires } = app.config.redis
     const jsencrypt = new NodeRSA(privateKey)
-    jsencrypt.setOptions({ encryptionScheme: 'pkcs1' }) // 因为jsencrypt自身使用的是pkcs1加密方案, nodejs需要修改成pkcs1。
+    // 因为jsencrypt自身使用的是pkcs1加密方案, nodejs需要修改成pkcs1。
+    jsencrypt.setOptions({ encryptionScheme: 'pkcs1' })
     const dePassword = jsencrypt.decrypt(password, 'utf8')
 
     const errors = await ctx.validate(userRule, {

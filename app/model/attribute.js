@@ -4,11 +4,11 @@ module.exports = app => {
 
   const AttributeSchema = new Schema({
     name: String,
-    type: String,
+    type: String || Boolean || Number,
     describe: String,
     createTime: Date,
     creator: String,
   })
 
-  return mongoose.model('attributes', AttributeSchema)
+  return mongoose.model('attribute', AttributeSchema)
 }
