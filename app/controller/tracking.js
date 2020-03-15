@@ -52,7 +52,6 @@ class Tracking extends Controller {
 
     const result = await service.tracking.findAll(query)
     ctx.body = ctx.responseBody(true, { data: result })
-    return
   }
 
   async create() {
