@@ -2,14 +2,16 @@ module.exports = () => {
   return async function(ctx, next) {
     const { secret } = ctx.app.config.jwt
     const { expires } = ctx.app.config.redis
-    const { authorization = '' } = ctx.request.header
-    const token = authorization.substring(7)
+    const { authorization } = ctx.request.header
+
+    let auth = ''
 
     try {
-      ctx.app.jwt.verify(token, secret)
+      auth = authorization.replace(/^bearer /, '')
+      ctx.app.jwt.verify(auth, secret)
     } catch (error) {
       /** 判断toekn是否过期 */
-      const decodeData = ctx.app.jwt.decode(token)
+      const decodeData = ctx.app.jwt.decode(auth)
       // 测试取消 token 验证
       if (!decodeData) {
         ctx.status = 401

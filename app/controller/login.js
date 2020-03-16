@@ -35,7 +35,7 @@ class Login extends Controller {
 
     if (!users || !users.username) {
       ctx.status = 403
-      ctx.body = ctx.responseBody(false, { msg: 'Account does not exist' })
+      ctx.body = ctx.responseBody(false, { msg: '账号不存在' })
       return
     }
 
