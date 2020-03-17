@@ -9,4 +9,6 @@ module.exports = app => {
   router.post('/api/v1/registry', controller.registry.index)
   router.post('/api/v1/tracking', controller.tracking.create)
   router.post('/api/v1/attribute', controller.attribute.create)
+
+  router.delete('/api/v1/attribute', controller.attribute.delete)
 }

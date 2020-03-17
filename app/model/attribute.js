@@ -3,11 +3,11 @@ module.exports = app => {
   const { Schema } = mongoose
 
   const AttributeSchema = new Schema({
-    name: String,
-    type: String || Boolean || Number,
-    describe: String,
-    createTime: Date,
-    creator: String,
+    name: { type: String, unique: true, require: true, index: true },
+    type: { type: String || Boolean || Number, required: true },
+    describe: { type: String, require: true },
+    createTime: { type: Date, default: Date.now },
+    creator: { type: String, require: true },
   })
 
   return mongoose.model('attribute', AttributeSchema)
