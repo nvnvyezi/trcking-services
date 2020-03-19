@@ -15,6 +15,13 @@ const attributePostRule = {
   type: { type: 'string', format: /(string|boolean|number)/ },
 }
 
+const attributePatchRule = {
+  updater: { type: 'string', max: 20 },
+  describe: { type: 'string', max: 100 },
+  name: { type: 'string', format: /\w{1,20}/ },
+  type: { type: 'string', format: /(string|boolean|number)/ },
+}
+
 const attributeDelRule = {
   name: { type: 'string', format: /\w{1,20}/ },
 }
@@ -59,7 +66,7 @@ class Attributes extends Controller {
 
     const findRes = await service.attribute.find({ name: body.name })
 
-    if (findRes.length) {
+    if (findRes.total) {
       ctx.status = 403
       ctx.body = ctx.responseBody(false, { msg: '属性已存在' })
       return
@@ -71,7 +78,35 @@ class Attributes extends Controller {
       ctx.body = ctx.responseBody(true, { msg: '属性创建成功' })
       return
     }
+
+    ctx.status = 500
     ctx.body = ctx.responseBody(false, { msg: '创建属性失败，请稍后重试' })
+  }
+
+  async update() {
+    const { ctx, service } = this
+    const { body } = ctx.request
+
+    const errors = await ctx.validate(attributePatchRule, body)
+
+    if (errors) {
+      ctx.status = 422
+      ctx.body = ctx.responseBody(false, { errors })
+      return
+    }
+
+    const { name, describe, type, updater } = body
+    const updateRes = await service.attribute.update(
+      { name },
+      { describe, type, updater },
+    )
+    if (updateRes.ok === 1) {
+      ctx.body = ctx.responseBody(true, { data: 'ok' })
+      return
+    }
+
+    ctx.status = 500
+    ctx.body = ctx.responseBody(false, { data: '属性更新失败' })
   }
 
   async delete() {

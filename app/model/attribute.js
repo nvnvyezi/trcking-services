@@ -8,6 +8,7 @@ module.exports = app => {
     describe: { type: String, require: true },
     createTime: { type: Date, default: Date.now },
     creator: { type: String, require: true },
+    updater: { type: String },
   })
 
   return mongoose.model('attribute', AttributeSchema)
