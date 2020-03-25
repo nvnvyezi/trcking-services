@@ -24,13 +24,13 @@ const trackingGetRule = {
 
 const trackingPostRule = {
   params: { type: 'array' },
-  type: { type: 'number', min: 0, max: 1 },
   demand: { type: 'string', min: 0, max: 30 },
-  event: { type: 'string', format: /\w{1,20}/ },
+  event: { type: 'string', format: /^\w{1,40}$/ },
   describe: { type: 'string', min: 0, max: 100 },
   principalPM: { type: 'string', min: 0, max: 20 },
+  type: { type: 'string', format: /(normal|kernel)/ },
   version: { type: 'string', format: /^(\d{1,2}\.){2}\d{1,2}$/ },
-  system: { type: 'string', format: /(android|ios|web|servers)/ },
+  system: { type: 'string', format: /(android|ios|web|server)/ },
   principalFE: { type: 'string', min: 0, max: 20, required: false },
   principalQA: { type: 'string', min: 0, max: 20, required: false },
   principalRD: { type: 'string', min: 0, max: 20, required: false },
@@ -57,6 +57,7 @@ class Tracking extends Controller {
   async create() {
     const { ctx, service } = this
     const { body } = ctx.request
+
     const errors = await ctx.validate(trackingPostRule, body)
 
     if (errors) {
@@ -65,8 +66,50 @@ class Tracking extends Controller {
       return
     }
 
-    body.createTime = new Date()
-    const insertResult = await service.tracking.insert(body)
+    const findRes = await service.tracking.find({ demand: body.demand })
+
+    if (findRes.total) {
+      ctx.status = 403
+      ctx.body = ctx.responseBody(false, { msg: '埋点已存在' })
+      return
+    }
+
+    // 处理params
+
+    const { params } = body
+    let handleParams = []
+
+    try {
+      handleParams = params.map(async param => {
+        const parseParam = JSON.parse(param) || {
+          name: 'test',
+          type: 'boolean',
+          describe: '这是一个测试',
+        }
+
+        const { total } = await service.attribute.find({
+          name: parseParam.name,
+        })
+        if (!total) {
+          await service.attribute.insert({
+            name: parseParam.name,
+            type: parseParam.type,
+            describe: parseParam.describe,
+            creator: body.principalPM,
+          })
+        }
+        return parseParam
+      })
+
+      handleParams = await Promise.all(handleParams)
+    } catch (error) {
+      //
+    }
+
+    const insertResult = await service.tracking.insert({
+      ...body,
+      params: handleParams,
+    })
 
     if (insertResult) {
       ctx.body = ctx.responseBody(true, { msg: '埋点创建成功' })

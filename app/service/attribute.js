@@ -16,20 +16,29 @@ class TrackService extends Service {
     return { list, total }
   }
 
-  async insert(params) {
-    const result = await this.ctx.model.Attribute.create(params)
-    return result
-  }
-
-  async update(params, updateParams) {
-    const result = await this.ctx.model.Attribute.update(params, {
-      $set: updateParams,
+  async insert({ name, type, describe, creator, updater }) {
+    const result = await this.ctx.model.Attribute.create({
+      name,
+      type,
+      creator,
+      updater,
+      describe,
     })
     return result
   }
 
-  async delete(params) {
-    const result = await this.ctx.model.Attribute.remove(params)
+  async update({ name }, { describe, type, updater }) {
+    const result = await this.ctx.model.Attribute.update(
+      { name },
+      {
+        $set: { describe, type, updater },
+      },
+    )
+    return result
+  }
+
+  async delete({ name }) {
+    const result = await this.ctx.model.Attribute.remove({ name })
     return result
   }
 }

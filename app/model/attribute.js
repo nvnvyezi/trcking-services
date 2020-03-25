@@ -3,12 +3,41 @@ module.exports = app => {
   const { Schema } = mongoose
 
   const AttributeSchema = new Schema({
-    name: { type: String, unique: true, require: true, index: true },
-    type: { type: String || Boolean || Number, required: true },
-    describe: { type: String, require: true },
-    createTime: { type: Date, default: Date.now },
-    creator: { type: String, require: true },
-    updater: { type: String },
+    name: {
+      trim: true,
+      index: true,
+      unique: true,
+      type: String,
+      require: true,
+    },
+    type: {
+      trim: true,
+      type: String,
+      required: true,
+      default: 'string',
+    },
+    describe: {
+      trim: true,
+      type: String,
+      require: true,
+      default: '这是一个描述',
+    },
+    createTime: {
+      type: Date,
+      default: Date.now,
+    },
+    creator: {
+      type: String,
+      require: true,
+      trim: true,
+      default: '',
+    },
+    updater: {
+      trim: true,
+      default: '',
+      type: String,
+      require: true,
+    },
   })
 
   return mongoose.model('attribute', AttributeSchema)
