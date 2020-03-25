@@ -23,7 +23,7 @@ const attributePatchRule = {
 }
 
 const attributeDelRule = {
-  name: { type: 'string', format: /\w{1,20}/ },
+  name: { type: 'string', format: /\w{1,20}/, require: true },
 }
 
 class Attributes extends Controller {

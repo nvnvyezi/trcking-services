@@ -7,8 +7,9 @@ module.exports = app => {
   router.post('/api/v1/login', controller.login.index)
   router.post('/api/v1/registry', controller.registry.index)
 
-  router.get('/api/v1/tracking', controller.tracking.get)
-  router.post('/api/v1/tracking', controller.tracking.create)
+  router.get(API.tracking, controller.tracking.get)
+  router.post(API.tracking, controller.tracking.create)
+  router.delete(API.tracking, controller.tracking.delete)
 
   router.get(API.attribute, controller.attribute.get)
   router.post(API.attribute, controller.attribute.create)

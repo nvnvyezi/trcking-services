@@ -1,20 +1,16 @@
 const { Controller } = require('egg')
 
 const trackingGetRule = {
-  type: { type: 'number', min: 0, max: 1, required: false },
-  demand: { type: 'string', min: 0, max: 30, required: false },
+  type: { type: 'string', format: /(normal|kernel)/, required: false },
+  // demand: { type: 'string', min: 0, max: 30, required: false },
   event: { type: 'string', format: /\w{1,20}/, required: false },
-  principalFE: { type: 'string', min: 0, max: 20, required: false },
-  principalPM: { type: 'string', min: 0, max: 20, required: false },
-  principalQA: { type: 'string', min: 0, max: 20, required: false },
-  principalRD: { type: 'string', min: 0, max: 20, required: false },
-  principalIos: { type: 'string', min: 0, max: 20, required: false },
-  principalAndroid: { type: 'string', min: 0, max: 20, required: false },
-  version: {
-    type: 'string',
-    required: false,
-    format: /^(\d{1,2}\.){2}\d{1,2}$/,
-  },
+  // principalPM: { type: 'string', min: 0, max: 20, required: false },
+  // version: {
+  //   type: 'string',
+  //   required: false,
+  //   format: /^(\d{1,2}\.){2}\d{1,2}$/,
+  // },
+  status: { type: 'number', min: 0, max: 5, require: false },
   system: {
     type: 'string',
     required: false,
@@ -24,6 +20,7 @@ const trackingGetRule = {
 
 const trackingPostRule = {
   params: { type: 'array' },
+  // status: { type: 'number', min: 0, max: 5 },
   demand: { type: 'string', min: 0, max: 30 },
   event: { type: 'string', format: /^\w{1,40}$/ },
   describe: { type: 'string', min: 0, max: 100 },
@@ -38,10 +35,16 @@ const trackingPostRule = {
   principalAndroid: { type: 'string', min: 0, max: 20, required: false },
 }
 
+const trackingDelRule = {
+  demand: { type: 'string', min: 0, max: 30, require: true },
+}
+
 class Tracking extends Controller {
   async get() {
     const { ctx, service } = this
     const { query } = ctx.request
+    const { skip, limit, type, system, status } = query
+    console.log(query)
     const errors = await ctx.validate(trackingGetRule, query)
 
     if (errors) {
@@ -50,8 +53,43 @@ class Tracking extends Controller {
       return
     }
 
-    const result = await service.tracking.findAll(query)
-    ctx.body = ctx.responseBody(true, { data: result })
+    const querys = {}
+
+    if (type) {
+      querys.type = type
+    }
+    if (status) {
+      querys.status = Number(status)
+    }
+    if (system) {
+      querys.system = system
+    }
+
+    const findRes = await service.tracking.find(querys, skip, limit)
+    ctx.body = ctx.responseBody(true, { data: findRes })
+  }
+
+  async delete() {
+    const { ctx, service } = this
+    const { body } = ctx.request
+
+    const errors = await ctx.validate(trackingDelRule, body)
+
+    if (errors) {
+      ctx.status = 422
+      ctx.body = ctx.responseBody(false, { errors })
+      return
+    }
+
+    const delRes = await service.tracking.delete({ demand: body.demand })
+
+    if (delRes.deletedCount === 0) {
+      ctx.status = 204
+      ctx.body = ctx.responseBody(false)
+      return
+    }
+
+    ctx.body = ctx.responseBody(true, { data: 'ok' })
   }
 
   async create() {
@@ -110,6 +148,8 @@ class Tracking extends Controller {
       ...body,
       params: handleParams,
     })
+
+    console.log('insertResult', insertResult)
 
     if (insertResult) {
       ctx.body = ctx.responseBody(true, { msg: '埋点创建成功' })

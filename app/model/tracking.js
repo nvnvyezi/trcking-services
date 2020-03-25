@@ -76,6 +76,11 @@ module.exports = app => {
       type: Date,
       default: Date.now,
     },
+    status: {
+      trim: true,
+      default: 0,
+      type: Number,
+    },
   })
 
   return mongoose.model('tracking', trackingSchema)
