@@ -13,6 +13,7 @@ module.exports = app => {
   router.delete(API.tracking, controller.tracking.delete)
 
   router.get(API.trackingVersion, controller.tracking.getAllVersion)
+  router.patch(API.trackingStatus, controller.tracking.updateStatus)
 
   router.get(API.attribute, controller.attribute.get)
   router.post(API.attribute, controller.attribute.create)

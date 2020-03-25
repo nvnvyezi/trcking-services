@@ -22,7 +22,6 @@ const trackingGetRule = {
 const trackingPostRule = {
   params: { type: 'array', required: false },
   demand: { type: 'string', min: 0, max: 30 },
-  // status: { type: 'number', min: 0, max: 5 },
   event: { type: 'string', format: /^\w{1,40}$/ },
   describe: { type: 'string', min: 0, max: 100 },
   principalPM: { type: 'string', min: 0, max: 20 },
@@ -34,6 +33,16 @@ const trackingPostRule = {
   principalRD: { type: 'string', min: 0, max: 20, required: false },
   principalIos: { type: 'string', min: 0, max: 20, required: false },
   principalAndroid: { type: 'string', min: 0, max: 20, required: false },
+}
+
+const trackingPathStatus = {
+  demand: { type: 'string', min: 0, max: 30 },
+  status: { type: 'number', min: 0, max: 5 },
+}
+
+const trackingPatchRule = {
+  ...trackingPostRule,
+  ...trackingPathStatus,
 }
 
 const trackingDelRule = {
@@ -85,7 +94,7 @@ class Tracking extends Controller {
     const { ctx, service } = this
     const { body } = ctx.request
 
-    const errors = await ctx.validate(trackingPostRule, body)
+    const errors = await ctx.validate(trackingPatchRule, body)
 
     if (errors) {
       ctx.status = 422
@@ -101,7 +110,33 @@ class Tracking extends Controller {
     }
 
     ctx.status = 500
-    ctx.body = ctx.responseBody(false, { data: '属性更新失败' })
+    ctx.body = ctx.responseBody(false, { data: '修改失败' })
+  }
+
+  async updateStatus() {
+    const { ctx, service } = this
+    const { body } = ctx.request
+
+    const errors = await ctx.validate(trackingPathStatus, body)
+
+    if (errors) {
+      ctx.status = 422
+      ctx.body = ctx.responseBody(false, { errors })
+      return
+    }
+
+    const { demand, status } = body
+    const updateRes = await service.tracking.updateStatus(
+      { demand },
+      { status },
+    )
+    if (updateRes.ok === 1) {
+      ctx.body = ctx.responseBody(true, { data: 'ok' })
+      return
+    }
+
+    ctx.status = 500
+    ctx.body = ctx.responseBody(false, { data: '修改失败' })
   }
 
   async delete() {
