@@ -9,7 +9,10 @@ module.exports = app => {
 
   router.get(API.tracking, controller.tracking.get)
   router.post(API.tracking, controller.tracking.create)
+  router.patch(API.tracking, controller.tracking.update)
   router.delete(API.tracking, controller.tracking.delete)
+
+  router.get(API.trackingVersion, controller.tracking.getAllVersion)
 
   router.get(API.attribute, controller.attribute.get)
   router.post(API.attribute, controller.attribute.create)

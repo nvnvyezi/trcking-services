@@ -5,12 +5,13 @@ const trackingGetRule = {
   // demand: { type: 'string', min: 0, max: 30, required: false },
   event: { type: 'string', format: /\w{1,20}/, required: false },
   // principalPM: { type: 'string', min: 0, max: 20, required: false },
-  // version: {
-  //   type: 'string',
-  //   required: false,
-  //   format: /^(\d{1,2}\.){2}\d{1,2}$/,
-  // },
-  status: { type: 'number', min: 0, max: 5, require: false },
+  version: {
+    type: 'string',
+    required: false,
+    format: /^(\d{1,2}\.){2}\d{1,2}$/,
+  },
+  status: { type: 'number', min: 0, max: 5, required: false },
+  demand: { type: 'string', min: 0, max: 30, required: false },
   system: {
     type: 'string',
     required: false,
@@ -19,9 +20,9 @@ const trackingGetRule = {
 }
 
 const trackingPostRule = {
-  params: { type: 'array' },
-  // status: { type: 'number', min: 0, max: 5 },
+  params: { type: 'array', required: false },
   demand: { type: 'string', min: 0, max: 30 },
+  // status: { type: 'number', min: 0, max: 5 },
   event: { type: 'string', format: /^\w{1,40}$/ },
   describe: { type: 'string', min: 0, max: 100 },
   principalPM: { type: 'string', min: 0, max: 20 },
@@ -43,8 +44,7 @@ class Tracking extends Controller {
   async get() {
     const { ctx, service } = this
     const { query } = ctx.request
-    const { skip, limit, type, system, status } = query
-    console.log(query)
+    const { skip, limit, type, system, status, demand, event, version } = query
     const errors = await ctx.validate(trackingGetRule, query)
 
     if (errors) {
@@ -53,7 +53,10 @@ class Tracking extends Controller {
       return
     }
 
-    const querys = {}
+    const querys = {
+      event: { $regex: new RegExp(event) },
+      demand: { $regex: new RegExp(demand) },
+    }
 
     if (type) {
       querys.type = type
@@ -64,9 +67,41 @@ class Tracking extends Controller {
     if (system) {
       querys.system = system
     }
+    if (version) {
+      querys.version = version
+    }
 
     const findRes = await service.tracking.find(querys, skip, limit)
     ctx.body = ctx.responseBody(true, { data: findRes })
+  }
+
+  async getAllVersion() {
+    const { ctx, service } = this
+    const findRes = await service.tracking.findAllVersion()
+    ctx.body = ctx.responseBody(true, { data: findRes })
+  }
+
+  async update() {
+    const { ctx, service } = this
+    const { body } = ctx.request
+
+    const errors = await ctx.validate(trackingPostRule, body)
+
+    if (errors) {
+      ctx.status = 422
+      ctx.body = ctx.responseBody(false, { errors })
+      return
+    }
+
+    const { demand, ...params } = body
+    const updateRes = await service.tracking.update({ demand }, params)
+    if (updateRes.ok === 1) {
+      ctx.body = ctx.responseBody(true, { data: 'ok' })
+      return
+    }
+
+    ctx.status = 500
+    ctx.body = ctx.responseBody(false, { data: '属性更新失败' })
   }
 
   async delete() {
@@ -113,7 +148,6 @@ class Tracking extends Controller {
     }
 
     // 处理params
-
     const { params } = body
     let handleParams = []
 
@@ -148,8 +182,6 @@ class Tracking extends Controller {
       ...body,
       params: handleParams,
     })
-
-    console.log('insertResult', insertResult)
 
     if (insertResult) {
       ctx.body = ctx.responseBody(true, { msg: '埋点创建成功' })

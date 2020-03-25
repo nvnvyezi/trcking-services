@@ -16,6 +16,48 @@ class TrackService extends Service {
     return { list, total }
   }
 
+  async findAllVersion() {
+    const result = await this.ctx.model.Tracking.distinct('version')
+    return result
+  }
+
+  async update(
+    { demand },
+    {
+      type,
+      event,
+      system,
+      version,
+      describe,
+      principalQA,
+      principalRD,
+      principalPM,
+      principalFE,
+      principalIos,
+      principalAndroid,
+    },
+  ) {
+    const result = await this.ctx.model.Tracking.update(
+      { demand },
+      {
+        $set: {
+          event,
+          describe,
+          system,
+          type,
+          version,
+          principalQA,
+          principalRD,
+          principalPM,
+          principalFE,
+          principalIos,
+          principalAndroid,
+        },
+      },
+    )
+    return result
+  }
+
   async delete({ demand }) {
     const result = await this.ctx.model.Tracking.remove({ demand })
     return result
