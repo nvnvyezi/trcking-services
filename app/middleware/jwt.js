@@ -12,7 +12,6 @@ module.exports = () => {
     } catch (error) {
       /** 判断toekn是否过期 */
       const decodeData = ctx.app.jwt.decode(auth)
-      // 测试取消 token 验证
       if (!decodeData) {
         ctx.status = 401
         ctx.body = ctx.responseBody(false, { msg: 'invalid token' })
@@ -35,8 +34,7 @@ module.exports = () => {
         })
       }
     }
-    console.time('report')
+
     await next()
-    console.timeEnd('report')
   }
 }

@@ -15,7 +15,7 @@ exports.validate = {
 
 exports.jwt = {
   enable: true,
-  ignore: [/^\/api\/v1\/(login|registry)$/, /^\/$/],
+  ignore: [/^\/api\/v1\/(login|registry|user\/status)$/, /^\/$/],
   secret: jwt.secret,
   expiresIn: '1h',
 }

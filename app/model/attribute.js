@@ -28,10 +28,10 @@ module.exports = app => {
         default: Date.now,
       },
       creator: {
-        type: String,
-        require: true,
         trim: true,
         default: '',
+        type: String,
+        require: true,
       },
       updater: {
         trim: true,
