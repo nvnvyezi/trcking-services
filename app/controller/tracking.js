@@ -35,14 +35,19 @@ const trackingPostRule = {
   principalAndroid: { type: 'string', min: 0, max: 20, required: false },
 }
 
-const trackingPathStatus = {
+const trackingPathStatusRule = {
   demand: { type: 'string', min: 0, max: 30 },
+  status: { type: 'number', min: 0, max: 5 },
+}
+
+const trackingBatchRule = {
+  demand: { type: 'string' },
   status: { type: 'number', min: 0, max: 5 },
 }
 
 const trackingPatchRule = {
   ...trackingPostRule,
-  ...trackingPathStatus,
+  ...trackingPathStatusRule,
 }
 
 const trackingDelRule = {
@@ -117,7 +122,7 @@ class Tracking extends Controller {
     const { ctx, service } = this
     const { body } = ctx.request
 
-    const errors = await ctx.validate(trackingPathStatus, body)
+    const errors = await ctx.validate(trackingPathStatusRule, body)
 
     if (errors) {
       ctx.status = 422
@@ -129,6 +134,35 @@ class Tracking extends Controller {
     const updateRes = await service.tracking.updateStatus(
       { demand },
       { status },
+    )
+    if (updateRes.ok === 1) {
+      ctx.body = ctx.responseBody(true, { data: 'ok' })
+      return
+    }
+
+    ctx.status = 500
+    ctx.body = ctx.responseBody(false, { data: '修改失败' })
+  }
+
+  async updateBatchStatus() {
+    const { ctx, service } = this
+    const { body } = ctx.request
+
+    const errors = await ctx.validate(trackingBatchRule, body)
+
+    if (errors) {
+      ctx.status = 422
+      ctx.body = ctx.responseBody(false, { errors })
+      return
+    }
+
+    const { demand, status } = body
+    const demands = demand.split(',')
+
+    const updateRes = await service.tracking.updateStatus(
+      { demand: { $in: demands } },
+      { status },
+      { multi: true },
     )
     if (updateRes.ok === 1) {
       ctx.body = ctx.responseBody(true, { data: 'ok' })

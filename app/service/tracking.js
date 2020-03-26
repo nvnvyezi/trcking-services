@@ -22,10 +22,11 @@ class TrackService extends Service {
     return result
   }
 
-  async updateStatus({ demand }, { status }) {
+  async updateStatus({ demand }, { status }, { multi = false }) {
     const result = await this.ctx.model.Tracking.update(
       { demand },
       { $set: { status } },
+      { multi },
     )
     return result
   }

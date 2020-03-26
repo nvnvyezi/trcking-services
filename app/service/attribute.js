@@ -27,6 +27,11 @@ class TrackService extends Service {
     return result
   }
 
+  async insertBatch(params) {
+    const result = await this.ctx.model.Attribute.insertMany(params)
+    return result
+  }
+
   async update({ name }, { describe, type, updater }) {
     const result = await this.ctx.model.Attribute.update(
       { name },

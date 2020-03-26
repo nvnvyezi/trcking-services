@@ -14,6 +14,7 @@ module.exports = app => {
 
   router.get(API.trackingVersion, controller.tracking.getAllVersion)
   router.patch(API.trackingStatus, controller.tracking.updateStatus)
+  router.patch(API.trackingBatch, controller.tracking.updateBatchStatus)
 
   router.get(API.attribute, controller.attribute.get)
   router.post(API.attribute, controller.attribute.create)
