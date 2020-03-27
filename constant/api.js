@@ -1,4 +1,5 @@
 module.exports = {
+  login: '/api/v1/login',
   tracking: '/api/v1/tracking',
   attribute: '/api/v1/attribute',
   userStatus: '/api/v1/user/status',

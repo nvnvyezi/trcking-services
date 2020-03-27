@@ -4,8 +4,10 @@ module.exports = app => {
   const { router, controller } = app
 
   router.get('/api/v1', controller.token.set)
-  router.post('/api/v1/login', controller.login.index)
   router.post('/api/v1/registry', controller.registry.index)
+
+  /** login */
+  router.post(API.login, controller.login.index)
 
   /** user */
   router.get(API.userStatus, controller.user.getUserStatus)

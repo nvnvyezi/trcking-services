@@ -27,7 +27,7 @@ exports.redis = {
     password: redis.password,
     db: redis.db,
   },
-  expires: 7 * 12 * 60 * 60 * 1000 + Date.now(),
+  expires: 302400,
 }
 exports.cluster = {
   listen: {
