@@ -11,8 +11,12 @@ class UserService extends Service {
     return result
   }
 
-  async insert(params) {
-    const result = await this.ctx.model.User.create(params)
+  async insert({ username, password, email }) {
+    const result = await this.ctx.model.User.create({
+      email,
+      username,
+      password,
+    })
     return result
   }
 }

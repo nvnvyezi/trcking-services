@@ -91,7 +91,7 @@ class Login extends Controller {
     const token = app.jwt.sign(
       {
         iss: 'liliye',
-        sub: 'buried-point-management',
+        sub: 'tracking-management',
         username,
       },
       secret,

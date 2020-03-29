@@ -71,7 +71,9 @@ class Login extends Controller {
       Authorization: `bearer ${token}`,
     })
 
-    ctx.body = ctx.responseBody(true, { admin: findRes.admin })
+    ctx.body = ctx.responseBody(true, {
+      data: { admin: findRes.admin, username },
+    })
   }
 }
 
