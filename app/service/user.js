@@ -1,9 +1,20 @@
 const { Service } = require('egg')
 
 class UserService extends Service {
-  async find(querys = {}) {
-    const result = await this.ctx.model.User.find(querys)
-    return result
+  async find(querys = {}, skip, limit) {
+    const list = await this.ctx.model.User.find(querys, {
+      _id: 0,
+      __v: 0,
+      password: 0,
+    })
+      .sort({ _id: -1 })
+      .skip(Number(skip))
+      .limit(Number(limit))
+    const total = await this.ctx.model.User.find(querys, {
+      _id: 0,
+      __v: 0,
+    }).count()
+    return { list, total }
   }
 
   async findOne(querys = {}) {
@@ -25,6 +36,19 @@ class UserService extends Service {
       { username },
       { $set: { email, password } },
     )
+    return result
+  }
+
+  async updateAdmin({ username }, { admin }) {
+    const result = await this.ctx.model.User.update(
+      { username },
+      { $set: { admin } },
+    )
+    return result
+  }
+
+  async delete({ username }) {
+    const result = await this.ctx.model.User.remove({ username })
     return result
   }
 }

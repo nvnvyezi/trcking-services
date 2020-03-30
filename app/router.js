@@ -12,10 +12,14 @@ module.exports = app => {
   router.post(API.login, controller.login.index)
 
   /** user */
+  router.get(API.user, controller.user.getAllUser)
   router.patch(API.user, controller.user.update)
+  router.delete(API.user, controller.user.delete)
 
   router.get(API.userStatus, controller.user.getUserStatus)
   router.delete(API.userStatus, controller.user.delUserStatus)
+
+  router.patch(API.userAdmin, controller.user.updateAdmin)
 
   /** attribute */
   router.get(API.attribute, controller.attribute.get)

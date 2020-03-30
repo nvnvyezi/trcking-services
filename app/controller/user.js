@@ -3,6 +3,11 @@ const NodeRSA = require('node-rsa')
 
 const { privateKey } = require('../../constant/rsa')
 
+const userGetRule = {
+  skip: { type: 'number', required: false },
+  limit: { type: 'number', required: false },
+}
+
 const userUpdateRule = {
   username: { type: 'string', max: 16, min: 1 },
   password: {
@@ -21,10 +26,55 @@ const userUpdateRule = {
 }
 
 const userStatusRule = {
-  username: { type: 'string', format: '', max: 16, min: 1 },
+  username: { type: 'string', max: 16, min: 1 },
+}
+
+const userAdminRule = {
+  username: { type: 'string', max: 16, min: 1 },
+  admin: { type: 'boolean' },
 }
 
 class Login extends Controller {
+  async getAllUser() {
+    const { ctx, service } = this
+    const {
+      query: { skip, limit },
+    } = ctx.request
+    const errors = await ctx.validate(userGetRule, ctx.request.query)
+
+    if (errors) {
+      ctx.status = 422
+      ctx.body = ctx.responseBody(false, { errors })
+      return
+    }
+
+    const findRes = await service.user.find({}, skip, limit)
+    ctx.body = ctx.responseBody(true, { data: findRes })
+  }
+
+  async delete() {
+    const { ctx, service } = this
+    const { body } = ctx.request
+
+    const errors = await ctx.validate(userStatusRule, body)
+
+    if (errors) {
+      ctx.status = 422
+      ctx.body = ctx.responseBody(false, { errors })
+      return
+    }
+
+    const delRes = await service.user.delete({ username: body.username })
+
+    if (delRes.deletedCount === 0) {
+      ctx.status = 204
+      ctx.body = ctx.responseBody(false)
+      return
+    }
+
+    ctx.body = ctx.responseBody(true, { data: 'ok' })
+  }
+
   async getUserStatus() {
     const { ctx, app } = this
     const { query } = ctx.request
@@ -68,6 +118,29 @@ class Login extends Controller {
 
     ctx.status = 500
     ctx.body = ctx.responseBody(false, { msg: '退出失败' })
+  }
+
+  async updateAdmin() {
+    const { ctx, service } = this
+    const { body } = ctx.request
+    const { username, admin } = body
+
+    const errors = await ctx.validate(userAdminRule, body)
+
+    if (errors) {
+      ctx.status = 422
+      ctx.body = ctx.responseBody(false, { errors })
+      return
+    }
+
+    const updateRes = await service.user.updateAdmin({ username }, { admin })
+    if (updateRes.ok === 1) {
+      ctx.body = ctx.responseBody(true, { data: 'ok' })
+      return
+    }
+
+    ctx.status = 500
+    ctx.body = ctx.responseBody(false, { data: '修改失败' })
   }
 
   async update() {

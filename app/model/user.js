@@ -26,6 +26,10 @@ module.exports = app => {
         type: String,
         default: '',
       },
+      createTime: {
+        type: Date,
+        default: Date.now,
+      },
     },
     { strict: 'throw' },
   )

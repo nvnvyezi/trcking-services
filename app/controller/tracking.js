@@ -134,6 +134,7 @@ class Tracking extends Controller {
     const updateRes = await service.tracking.updateStatus(
       { demand },
       { status },
+      { multi: false },
     )
     if (updateRes.ok === 1) {
       ctx.body = ctx.responseBody(true, { data: 'ok' })
