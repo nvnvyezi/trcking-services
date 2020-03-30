@@ -24,6 +24,7 @@ module.exports = app => {
       email: {
         trim: true,
         type: String,
+        default: '',
       },
     },
     { strict: 'throw' },

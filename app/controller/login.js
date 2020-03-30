@@ -72,7 +72,7 @@ class Login extends Controller {
     })
 
     ctx.body = ctx.responseBody(true, {
-      data: { admin: findRes.admin, username },
+      data: { admin: findRes.admin, username, email: findRes.email },
     })
   }
 }

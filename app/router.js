@@ -12,6 +12,8 @@ module.exports = app => {
   router.post(API.login, controller.login.index)
 
   /** user */
+  router.patch(API.user, controller.user.update)
+
   router.get(API.userStatus, controller.user.getUserStatus)
   router.delete(API.userStatus, controller.user.delUserStatus)
 

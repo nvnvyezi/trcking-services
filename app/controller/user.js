@@ -3,10 +3,21 @@ const NodeRSA = require('node-rsa')
 
 const { privateKey } = require('../../constant/rsa')
 
-const userRule = {
-  username: { type: 'string', format: '', max: 16, min: 1 },
-  password: { type: 'password', compare: '', max: 16, min: 6 },
-  remember: { type: 'boolean' },
+const userUpdateRule = {
+  username: { type: 'string', max: 16, min: 1 },
+  password: {
+    type: 'password',
+    format: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/,
+  },
+  passwordOld: {
+    type: 'password',
+    format: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/,
+  },
+  email: {
+    type: 'email',
+    required: false,
+    format: /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/,
+  },
 }
 
 const userStatusRule = {
@@ -59,19 +70,29 @@ class Login extends Controller {
     ctx.body = ctx.responseBody(false, { msg: '退出失败' })
   }
 
-  async index() {
-    const { ctx, service, app } = this
-    const { username, password, remember } = ctx.request.body
-    const { secret } = app.config.jwt
-    const { expires } = app.config.redis
+  async update() {
+    const { ctx, service } = this
+    const { body } = ctx.request
+    const { username, password, email, passwordOld } = body
+
     const jsencrypt = new NodeRSA(privateKey)
     // 因为jsencrypt自身使用的是pkcs1加密方案, nodejs需要修改成pkcs1。
     jsencrypt.setOptions({ encryptionScheme: 'pkcs1' })
-    const dePassword = jsencrypt.decrypt(password, 'utf8')
 
-    const errors = await ctx.validate(userRule, {
+    let dePassword = ''
+    let dePasswordOld = ''
+    try {
+      dePassword = jsencrypt.decrypt(password, 'utf8')
+      dePasswordOld = jsencrypt.decrypt(passwordOld, 'utf8')
+    } catch (error) {
+      ctx.status = 422
+      ctx.body = ctx.responseBody(false, { msg: '字段非法' })
+      return
+    }
+
+    const errors = await ctx.validate(userUpdateRule, {
       ...ctx.request.body,
-      password: dePassword,
+      password: dePasswordOld,
     })
 
     if (errors) {
@@ -80,37 +101,34 @@ class Login extends Controller {
       return
     }
 
-    const users = await service.user.findFromLogin(username, dePassword)
+    const findRes = await service.user.findOne({
+      username,
+      password: dePasswordOld,
+    })
 
-    if (!users || !users.username) {
-      ctx.status = 403
-      ctx.body = ctx.responseBody(false, { msg: '账号不存在' })
+    if (!findRes || findRes.username !== username) {
+      ctx.status = 498
+      ctx.body = ctx.responseBody(false, { msg: '原密码错误' })
       return
     }
 
-    const token = app.jwt.sign(
-      {
-        iss: 'liliye',
-        sub: 'tracking-management',
-        username,
-      },
-      secret,
-    )
-
-    if (remember) {
-      await app.redis.setnx(username, username)
-      const expiresStatus = await app.redis.pexpireat(username, expires)
-
-      if (expiresStatus === 0) {
-        await app.redis.del(username)
-      }
+    if (dePassword === dePasswordOld) {
+      ctx.status = 498
+      ctx.body = ctx.responseBody(false, { msg: '新密码不能和旧密码一样' })
+      return
     }
 
-    ctx.set({
-      Authorization: `bearer ${token}`,
-    })
+    const updateRes = await service.user.update(
+      { username },
+      { email, password: dePassword },
+    )
+    if (updateRes.ok === 1) {
+      ctx.body = ctx.responseBody(true, { data: 'ok' })
+      return
+    }
 
-    ctx.body = ctx.responseBody(true, { username, remember })
+    ctx.status = 500
+    ctx.body = ctx.responseBody(false, { data: '修改失败' })
   }
 }
 

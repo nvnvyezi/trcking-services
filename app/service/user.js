@@ -19,6 +19,14 @@ class UserService extends Service {
     })
     return result
   }
+
+  async update({ username }, { email, password }) {
+    const result = await this.ctx.model.User.update(
+      { username },
+      { $set: { email, password } },
+    )
+    return result
+  }
 }
 
 module.exports = UserService
