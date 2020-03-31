@@ -9,6 +9,10 @@ module.exports = app => {
   router.get(API.event, controller.event.get)
   router.post(API.event, controller.event.create)
 
+  router.get(API.eventCount, controller.event.getCount)
+  router.get(API.eventEvent, controller.event.getAllEvent)
+  router.get(API.eventDemand, controller.event.getAllDemand)
+
   /** register */
   router.post(API.register, controller.registry.index)
 

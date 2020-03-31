@@ -11,6 +11,13 @@ const eventGetRule = {
   deviceId: { type: 'string', required: false },
 }
 
+const eventCountRule = {
+  event: { type: 'string', format: /^\w{1,40}$/ },
+  demand: { type: 'string', min: 0, max: 30 },
+  startTime: { type: 'string' },
+  endTime: { type: 'string' },
+}
+
 const eventPostRule = {
   event: { type: 'string', format: /^\w{1,40}$/ },
   url: {
@@ -31,15 +38,41 @@ const eventPostRule = {
   deviceId: { type: 'string' },
 }
 
-const trackingDelRule = {
-  demand: { type: 'string', min: 0, max: 30 },
+function getNextDate(dayStr) {
+  const dd = new Date(dayStr)
+  dd.setDate(dd.getDate() + 1)
+  const y = dd.getFullYear()
+  const m = dd.getMonth() + 1
+  const d = dd.getDate()
+  return y + '-' + String(m).padStart(2, 0) + '-' + String(d).padStart(2, 0)
 }
 
 class Tracking extends Controller {
+  async getAllEvent() {
+    const { ctx, service } = this
+    const findRes = await service.event.findAllEvent()
+    ctx.body = ctx.responseBody(true, { data: findRes })
+  }
+
+  async getAllDemand() {
+    const { ctx, service } = this
+    const findRes = await service.event.findAllDemand()
+    ctx.body = ctx.responseBody(true, { data: findRes })
+  }
+
   async get() {
     const { ctx, service } = this
     const { query } = ctx.request
-    const { skip, limit, event, system, demand, deviceId } = query
+    const {
+      skip,
+      limit,
+      event,
+      system,
+      demand,
+      endTime,
+      deviceId,
+      startTime,
+    } = query
     const errors = await ctx.validate(eventGetRule, query)
 
     if (errors) {
@@ -61,16 +94,24 @@ class Tracking extends Controller {
     if (deviceId) {
       querys.deviceId = deviceId
     }
+    const timeQuery = {}
+    if (startTime) {
+      timeQuery.$gte = new Date(`${startTime} 00:00:00`)
+    }
+    if (startTime) {
+      timeQuery.$lt = new Date(`${endTime} 23:59:59`)
+    }
+    querys.createTime = timeQuery
 
     const findRes = await service.event.find(querys, skip, limit)
     ctx.body = ctx.responseBody(true, { data: findRes })
   }
 
-  async delete() {
+  async getCount() {
     const { ctx, service } = this
-    const { body } = ctx.request
-
-    const errors = await ctx.validate(trackingDelRule, body)
+    const { query } = ctx.request
+    const { event, demand, endTime, startTime } = query
+    const errors = await ctx.validate(eventCountRule, query)
 
     if (errors) {
       ctx.status = 422
@@ -78,15 +119,41 @@ class Tracking extends Controller {
       return
     }
 
-    const delRes = await service.tracking.delete({ demand: body.demand })
+    const allTime = [startTime]
+    let currTime = startTime
+    while (currTime !== endTime) {
+      currTime = getNextDate(currTime)
+      allTime.push(currTime)
+    }
 
-    if (delRes.deletedCount === 0) {
-      ctx.status = 204
-      ctx.body = ctx.responseBody(false)
+    let listRes = []
+
+    try {
+      const promiseArr = allTime.map(async time => {
+        const findRes = await service.event.findCount(
+          {
+            demand,
+            event,
+            createTime: {
+              $gte: new Date(`${time} 00:00:00`),
+              $lt: new Date(`${time} 23:59:59`),
+            },
+          },
+          time,
+        )
+        return findRes
+      })
+
+      listRes = await Promise.all(promiseArr)
+    } catch (error) {
+      ctx.status = 498
+      ctx.body = ctx.responseBody(false, {
+        msg: '查询出错，请稍后再试',
+      })
       return
     }
 
-    ctx.body = ctx.responseBody(true, { data: 'ok' })
+    ctx.body = ctx.responseBody(true, { data: listRes })
   }
 
   async create() {

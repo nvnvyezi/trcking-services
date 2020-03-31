@@ -16,9 +16,22 @@ class EventService extends Service {
     return { list, total }
   }
 
-  async findAllVersion() {
-    const result = (await this.ctx.model.Event.distinct('version')) || []
-    return result.filter(item => !!item).sort()
+  async findCount(querys = {}, time) {
+    const total = await this.ctx.model.Event.find(querys, {
+      _id: 0,
+      __v: 0,
+    }).countDocuments()
+    return { time, total }
+  }
+
+  async findAllEvent() {
+    const result = (await this.ctx.model.Event.distinct('event')) || []
+    return result.filter(item => !!item)
+  }
+
+  async findAllDemand() {
+    const result = (await this.ctx.model.Event.distinct('demand')) || []
+    return result.filter(item => !!item)
   }
 
   async updateStatus({ demand }, { status }, { multi = false }) {
@@ -41,6 +54,7 @@ class EventService extends Service {
     city,
     event,
     params,
+    demand,
     system,
     country,
     province,
@@ -52,6 +66,7 @@ class EventService extends Service {
       city,
       event,
       params,
+      demand,
       system,
       country,
       province,

@@ -215,7 +215,10 @@ class Tracking extends Controller {
       return
     }
 
-    const findRes = await service.tracking.find({ demand: body.demand })
+    const findRes = await service.tracking.find({
+      demand: body.demand,
+      event: body.event,
+    })
 
     if (findRes.total) {
       ctx.status = 403
@@ -251,7 +254,11 @@ class Tracking extends Controller {
 
       handleParams = await Promise.all(handleParams)
     } catch (error) {
-      //
+      ctx.status = 498
+      ctx.body = ctx.responseBody(false, {
+        msg: '同步更新属性失败，请稍后重新创建',
+      })
+      return
     }
 
     const insertResult = await service.tracking.insert({
@@ -260,7 +267,7 @@ class Tracking extends Controller {
     })
 
     if (insertResult) {
-      ctx.body = ctx.responseBody(true, { msg: '埋点创建成功' })
+      ctx.body = ctx.responseBody(true, { data: '埋点创建成功' })
       return
     }
     ctx.body = ctx.responseBody(false, { msg: '创建埋点失败，请稍后重试' })
