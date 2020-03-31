@@ -31,7 +31,7 @@ module.exports = app => {
         default: Date.now,
       },
     },
-    { strict: 'throw' },
+    { strict: 'throw', useCreateIndex: true },
   )
 
   return mongoose.model('users', userSchema)

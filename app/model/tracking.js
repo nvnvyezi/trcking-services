@@ -83,7 +83,7 @@ module.exports = app => {
         type: Number,
       },
     },
-    { strict: 'throw' },
+    { strict: 'throw', useCreateIndex: true },
   )
 
   return mongoose.model('tracking', trackingSchema)

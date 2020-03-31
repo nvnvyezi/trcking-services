@@ -12,14 +12,18 @@ class TrackService extends Service {
     const total = await this.ctx.model.Tracking.find(querys, {
       _id: 0,
       __v: 0,
-    }).count()
+    }).countDocuments()
     return { list, total }
   }
 
   async findAllVersion() {
-    let result = (await this.ctx.model.Tracking.distinct('version')) || []
-    result = result.filter(item => !!item).sort()
-    return result
+    const result = (await this.ctx.model.Tracking.distinct('version')) || []
+    return result.filter(item => !!item).sort()
+  }
+
+  async findAllDemand() {
+    const result = (await this.ctx.model.Tracking.distinct('demand')) || []
+    return result.filter(item => !!item)
   }
 
   async updateStatus({ demand }, { status }, { multi = false }) {

@@ -13,7 +13,7 @@ class UserService extends Service {
     const total = await this.ctx.model.User.find(querys, {
       _id: 0,
       __v: 0,
-    }).count()
+    }).countDocuments()
     return { list, total }
   }
 

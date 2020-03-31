@@ -40,7 +40,7 @@ module.exports = app => {
         require: true,
       },
     },
-    { strict: 'throw' },
+    { strict: 'throw', useCreateIndex: true },
   )
 
   return mongoose.model('attribute', AttributeSchema)

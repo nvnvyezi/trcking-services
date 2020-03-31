@@ -50,7 +50,7 @@ class Login extends Controller {
 
     if (!findRes || findRes.username !== username) {
       ctx.status = 403
-      ctx.body = ctx.responseBody(false, { msg: '账号不存在' })
+      ctx.body = ctx.responseBody(false, { msg: '账号不存在或者密码错误' })
       return
     }
 

@@ -12,7 +12,7 @@ class TrackService extends Service {
     const total = await this.ctx.model.Attribute.find(querys, {
       _id: 0,
       __v: 0,
-    }).count()
+    }).countDocuments()
     return { list, total }
   }
 

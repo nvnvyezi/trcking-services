@@ -51,7 +51,7 @@ const trackingPatchRule = {
 }
 
 const trackingDelRule = {
-  demand: { type: 'string', min: 0, max: 30, require: true },
+  demand: { type: 'string', min: 0, max: 30 },
 }
 
 class Tracking extends Controller {
@@ -92,6 +92,12 @@ class Tracking extends Controller {
   async getAllVersion() {
     const { ctx, service } = this
     const findRes = await service.tracking.findAllVersion()
+    ctx.body = ctx.responseBody(true, { data: findRes })
+  }
+
+  async getAllDemand() {
+    const { ctx, service } = this
+    const findRes = await service.tracking.findAllDemand()
     ctx.body = ctx.responseBody(true, { data: findRes })
   }
 

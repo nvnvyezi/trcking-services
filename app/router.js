@@ -5,6 +5,10 @@ module.exports = app => {
 
   router.get('/api/v1', controller.token.set)
 
+  /** event */
+  router.get(API.event, controller.event.get)
+  router.post(API.event, controller.event.create)
+
   /** register */
   router.post(API.register, controller.registry.index)
 
@@ -33,6 +37,7 @@ module.exports = app => {
   router.patch(API.tracking, controller.tracking.update)
   router.delete(API.tracking, controller.tracking.delete)
 
+  router.get(API.trackingDemand, controller.tracking.getAllDemand)
   router.get(API.trackingVersion, controller.tracking.getAllVersion)
   router.patch(API.trackingStatus, controller.tracking.updateStatus)
   router.patch(API.trackingBatch, controller.tracking.updateBatchStatus)
