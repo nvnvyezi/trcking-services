@@ -98,7 +98,7 @@ class Tracking extends Controller {
     if (startTime) {
       timeQuery.$gte = new Date(`${startTime} 00:00:00`)
     }
-    if (startTime) {
+    if (endTime) {
       timeQuery.$lt = new Date(`${endTime} 23:59:59`)
     }
     querys.createTime = timeQuery

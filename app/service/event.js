@@ -6,7 +6,7 @@ class EventService extends Service {
       _id: 0,
       __v: 0,
     })
-      .sort({ _id: -1 })
+      .sort({ _id: 1 })
       .skip(Number(skip))
       .limit(Number(limit))
     const total = await this.ctx.model.Event.find(querys, {
@@ -57,6 +57,7 @@ class EventService extends Service {
     demand,
     system,
     country,
+    deviceId,
     province,
     useragent,
   }) {
@@ -69,6 +70,7 @@ class EventService extends Service {
       demand,
       system,
       country,
+      deviceId,
       province,
       useragent,
     })
