@@ -230,35 +230,37 @@ class Tracking extends Controller {
     const { params } = body
     let handleParams = []
 
-    try {
-      handleParams = params.map(async param => {
-        const parseParam = JSON.parse(param) || {
-          name: 'test',
-          type: 'boolean',
-          describe: '这是一个测试',
-        }
+    if (params && params.length) {
+      try {
+        handleParams = params.map(async param => {
+          const parseParam = JSON.parse(param) || {
+            name: 'test',
+            type: 'boolean',
+            describe: '这是一个测试',
+          }
 
-        const { total } = await service.attribute.find({
-          name: parseParam.name,
-        })
-        if (!total) {
-          await service.attribute.insert({
+          const { total } = await service.attribute.find({
             name: parseParam.name,
-            type: parseParam.type,
-            describe: parseParam.describe,
-            creator: body.principalPM,
           })
-        }
-        return parseParam
-      })
+          if (!total) {
+            await service.attribute.insert({
+              name: parseParam.name,
+              type: parseParam.type,
+              describe: parseParam.describe,
+              creator: body.principalPM,
+            })
+          }
+          return parseParam
+        })
 
-      handleParams = await Promise.all(handleParams)
-    } catch (error) {
-      ctx.status = 498
-      ctx.body = ctx.responseBody(false, {
-        msg: '同步更新属性失败，请稍后重新创建',
-      })
-      return
+        handleParams = await Promise.all(handleParams)
+      } catch (error) {
+        ctx.status = 498
+        ctx.body = ctx.responseBody(false, {
+          msg: '同步更新属性失败，请稍后重新创建',
+        })
+        return
+      }
     }
 
     const insertResult = await service.tracking.insert({
